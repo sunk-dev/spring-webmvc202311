@@ -4,6 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class ControllerV2 {
 
     == 1.Model객체 사용
     -> 자바가 가지고 있는데이터를 jsp 로 넘겨줄때 사용하는 바구니 같은 역할
-    ->
+    -> 일반적으로 쓰는 방법
 
      */
 
@@ -30,11 +31,33 @@ public class ControllerV2 {
 
         return "chap02/hobbies";
     }
+    
+    /*
+    == 2. ModelAndView 객체 사용
+    
+    
+     */
 
     @GetMapping("/hobbies2")
-    public  String hobbies2(){
+    public ModelAndView hobbies2(){
         System.out.println("취미2 안녕");
-        return "";
+        
+        //jsp로 보낸 데이터
+        String name="냥냥이";
+        List<String> hList = List.of("사마귀랑 놀기", "츄르먹기");
+        
+        //jsp로 보낼 데이터를 ModelAndView에 담기
+
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("userName",name);
+        mv.addObject("hobbies",hList);
+        
+        
+        //view의 데이터를 따로 담아줌
+        mv.setViewName("chap02/hobbies");
+        
+        return mv;
+        
     }
 
 }
