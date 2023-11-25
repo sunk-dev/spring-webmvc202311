@@ -18,6 +18,7 @@ import java.util.List;
 public interface ScoreRepository {
     //성적정보 전체 목록조회
     List<Score> findAll();
+    List<Score> findAll(String sort);
     //성적정보 등록
     boolean save(Score score);
     //성적정보 1개 삭제
