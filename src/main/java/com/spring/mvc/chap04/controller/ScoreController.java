@@ -39,7 +39,7 @@ public class ScoreController {
 
 //    저장소에 의존하여 데이터 처리를 위인한다.
     //의존객체는 불변성을 가지는 것이 좋다.
-    private final ScoreRepository repository;
+//    private final ScoreRepository repository;
     private  final ScoreService service;
 
 //    @Autowired //스프링에 등록된 빈을 자동주입
@@ -59,7 +59,7 @@ public class ScoreController {
         System.out.println("/score/list GET");
 
         //db에서 조회한 모든 데이터
-        List<Score> scoreList = repository.findAll(sort);
+//        List<Score> scoreList = repository.findAll(sort);
 //        System.out.println("scoreList = " + scoreList);
 //
         //클라이언트가 필요한 일부데이터
@@ -87,10 +87,7 @@ public class ScoreController {
         System.out.println("score = " + score);
 
         //dto를 엔터티로 변환->데이터 생성
-        Score savedScore = new Score(score);
-
-
-        repository.save(savedScore);
+        service.insertScore(score);
 
         /**
          * forward vs redirect
@@ -114,11 +111,8 @@ public class ScoreController {
     public String remove(HttpServletRequest request,
                          @PathVariable int stuNum){
 
-
         System.out.println("삭제학번"+stuNum);
-        repository.delete(stuNum);
-
-
+        service.deleteScore(stuNum);
 
         return "redirect:/score/list";
     }
@@ -145,7 +139,7 @@ public class ScoreController {
     }
 
     private void retrieve(int stuNum, Model model) {
-        Score score = repository.findOne(stuNum);
+        Score score = service.retrieve(stuNum);
         model.addAttribute("s",score);
     }
 
@@ -154,11 +148,7 @@ public class ScoreController {
     @PostMapping ("modify")
     public  String modify(int stuNum, ScoreRequestDto dto){
         System.out.println("/score/modify GET");
-        // 수정의 흐름
-        //클라이언트가 수정할데이터를 보냄
-        //-> 서버에 저장되어있던 기존 데이터를 조회해서 수정한다.
-        Score score = repository.findOne(stuNum);
-        score.changeScore(dto);
+       service.updateScore(stuNum,dto);
 
         return "redirect:/score/detail?stuNum="+stuNum;
     }
