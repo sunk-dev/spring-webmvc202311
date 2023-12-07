@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Comparator.*;
 
-@Repository
+@Repository("mRepo")
 // ---IMpl ->인터페이스의 구체버전이라는뜻
 public class ScoreRepositoryImpl implements ScoreRepository {
 
