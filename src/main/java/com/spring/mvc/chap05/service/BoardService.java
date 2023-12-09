@@ -4,7 +4,7 @@ import com.spring.mvc.chap05.dto.BoardDetailResponseDTO;
 import com.spring.mvc.chap05.dto.BoardListResponseDTO;
 import com.spring.mvc.chap05.dto.BoardWriteRequestDTO;
 import com.spring.mvc.chap05.entity.Board;
-import com.spring.mvc.chap05.repository.BoardRepositoty;
+import com.spring.mvc.chap05.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BoardService {
     
-    private  final  BoardRepositoty boardRepositoty;
+    private  final BoardRepository boardRepositoty;
     
     //목록조회 중간처리
     public List<BoardListResponseDTO> getList(){
@@ -41,7 +41,7 @@ public class BoardService {
     public BoardDetailResponseDTO getDetail(int bno) {
         Board board = boardRepositoty.findOne(bno);
         //조회수 상승처리-> 이름을 좀더 명확하게 만들기
-        board.upViewCount();
+        boardRepositoty.updateViewCount(bno);
 
         return new BoardDetailResponseDTO(board);
         

@@ -1,9 +1,6 @@
 package com.spring.mvc.chap05.repository;
 
 import com.spring.mvc.chap05.entity.Board;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
-import org.springframework.util.comparator.Comparators;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -11,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Repository
-public class BoardRepositoryImpl implements BoardRepositoty {
+
+public class BoardRepositoryImpl implements BoardRepository {
     private static final Map<Integer ,Board> boardMap;
     //글번호 자동으로 증가시키기 위한 공유필드
     private  static  int sequence;

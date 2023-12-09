@@ -6,7 +6,7 @@ import com.spring.mvc.chap05.entity.Board;
 import java.util.List;
 
 //게시판 CRUD 기능 명세
-public interface BoardRepositoty {
+public interface BoardRepository {
 
     //목록조회
     List<Board> finaAll();
@@ -19,5 +19,9 @@ public interface BoardRepositoty {
 
     //게시물 사삭데
     boolean deleteByNo(int boardNo);
+
+    //조회수 상승 기능 처리
+    //추가로
+    default void updateViewCount(int boardNo){};
 
 }
