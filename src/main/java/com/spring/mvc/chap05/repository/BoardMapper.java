@@ -1,5 +1,6 @@
 package com.spring.mvc.chap05.repository;
 
+import com.spring.mvc.chap05.common.Page;
 import com.spring.mvc.chap05.entity.Board;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -10,7 +11,7 @@ public interface BoardMapper  {
     /////
 
     //목록조회
-    List<Board> findAll();
+    List<Board> findAll(Page page);
 
     //상세조회
     Board findOne(int boardNo);
@@ -24,4 +25,7 @@ public interface BoardMapper  {
     //조회수 상승 기능 처리
     //추가로
     void updateViewCount(int boardNo);
+
+    //총게시물수 구하기
+    int count();
 }

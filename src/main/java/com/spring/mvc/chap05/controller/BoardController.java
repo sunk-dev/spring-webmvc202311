@@ -1,5 +1,7 @@
 package com.spring.mvc.chap05.controller;
 
+import com.spring.mvc.chap05.common.Page;
+import com.spring.mvc.chap05.common.PageMaker;
 import com.spring.mvc.chap05.dto.BoardListResponseDTO;
 import com.spring.mvc.chap05.dto.BoardWriteRequestDTO;
 import com.spring.mvc.chap05.service.BoardService;
@@ -22,9 +24,14 @@ public class BoardController {
 
     // 1. 목록 조회 요청 (/board/list : GET)
     @GetMapping("/list")
-    public String list(Model model){
-        List<BoardListResponseDTO> dtoList = boardService.getList();
+    public String list(Page page, Model model){
+        List<BoardListResponseDTO> dtoList = boardService.getList(page);
+
+        //페이징 계산 알고리즘 적용
+        PageMaker pageMaker = new PageMaker(page, boardService.getCount());
+        System.out.println(page);
         model.addAttribute("bList",dtoList);
+        model.addAttribute("maker",pageMaker);
         return "chap05/list";
     }
     // 2. 글쓰기 화면요청 (/board/write : GET)

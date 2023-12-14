@@ -6,6 +6,7 @@
     <select id="findAll" resultType="board">
         select * from tbl_board
         order by board_no desc
+        limit #{pageStart},#{amount}
     </select>
     <select id="findOne"  resultType="board">
         select * from tbl_board
@@ -26,5 +27,10 @@
         set view_count=view_count+1
         where board_no=#{boardNo}
     </update>
+
+    <select id="count" resultType="int">
+        SELECT COUNT(*) FROM tbl_board
+
+    </select>
 
 </mapper>

@@ -1,9 +1,11 @@
 package com.spring.mvc.chap05.service;
 
+import com.spring.mvc.chap05.common.Page;
 import com.spring.mvc.chap05.dto.BoardDetailResponseDTO;
 import com.spring.mvc.chap05.dto.BoardListResponseDTO;
 import com.spring.mvc.chap05.dto.BoardWriteRequestDTO;
 import com.spring.mvc.chap05.entity.Board;
+import com.spring.mvc.chap05.repository.BoardMapper;
 import com.spring.mvc.chap05.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,11 +17,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BoardService {
     
-    private  final BoardRepository boardRepositoty;
+//    private  final BoardRepository boardRepositoty;
+    private final BoardMapper boardRepositoty;
     
     //목록조회 중간처리
-    public List<BoardListResponseDTO> getList(){
-        return boardRepositoty.finaAll()
+    public List<BoardListResponseDTO> getList(Page page){
+        return boardRepositoty.findAll(page)
                 .stream()
                 .map(BoardListResponseDTO::new)
                 .collect(Collectors.toList());
@@ -45,6 +48,10 @@ public class BoardService {
 
         return new BoardDetailResponseDTO(board);
         
+    }
+
+    public int getCount(){
+        return  boardRepositoty.count();
     }
 }
 
