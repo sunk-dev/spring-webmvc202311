@@ -78,7 +78,13 @@
         <nav aria-label="Page navigation example">
             <ul class="pagination pagination-lg pagination-custom">
 
+<%--                맨 앞으로 가기 버튼 -> 1페이지 에서는 안보이게
+                       맨뒤로 가기 버튼 마지막 페이지 에서는 안보이게 --%>
+                <c:if test="${maker.page.pageNo!=1}">
+                    <li class="page-item"><a class="page-link" href="/board/list/?pageNo=1">&lt;&lt;</a>
+                </c:if>
                 <c:if test="${maker.prev}">
+
                     <li class="page-item"><a class="page-link" href="/board/list/?pageNo=${maker.begin-1}">prev</a>
                 </c:if>
 
@@ -87,7 +93,7 @@
                 </li>
 
                 <c:forEach var="i" begin="${maker.begin}" end="${maker.end}" step="1">
-                    <li data-page-num="" class="page-item">
+                    <li data-page-num="${i}" class="page-item">
                         <a class="page-link" href="/board/list?pageNo=${i}">${i}</a>
                     </li>
                 </c:forEach>
@@ -95,7 +101,12 @@
                 <c:if test="${maker.next}">
 
                     <li class="page-item"><a class="page-link" href="/board/list?pageNo=${maker.end+1}">next</a></li>
+                </c:if>
 
+<%--    마지막에서 없애는 법...--%>
+                <c:if test="${maker.page.pageNo!=maker.finalPage}">
+                <li class="page-item"><a class="page-link" href="/board/list/?pageNo=${maker.finalPage}">&gt;&gt;</a>
+                </li>
                 </c:if>
 
 
@@ -218,6 +229,25 @@
         window.location.href = '/board/write';
     };
 
+    // 현재 위치한 페이지의 active 스타일 부여
+    function appendPageActive(){
+        // 현재 서버에서 내려준 페이지 번호
+        const currPage='${maker.page.pageNo}';
+        //console.log(currPage);
+        /*
+        li태그들을 전부 확인해서 현재 페이지 번호와 일치하는 li를 찾은다음 active 클래스 붙임
+
+         */
+        const $ul=document.querySelector('.pagination');
+        const $liList=[...$ul.children];
+        $liList.forEach($li => {
+            if(currPage===$li.dataset.pageNum){
+                $li.classList.add('active');
+            }
+        })
+
+    }
+    appendPageActive();
 
 
 </script>
