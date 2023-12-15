@@ -36,6 +36,36 @@
         <button class="add-btn">새 글 쓰기</button>
     </div>
 
+    <div class="top-section">
+        <!-- 검색창 영역 -->
+        <div class="search">
+            <form action="/board/list" method="get">
+
+                <select  class="form-select" name="type" id="search-type">
+                    <option value="title">제목</option>
+                    <option value="content">내용</option>
+                    <option value="writer">작성자</option>
+                    <option value="tc">제목+내용</option>
+                </select>
+
+                <input type="text" class="form-control" name="keyword" value="${s.keyword}">
+
+                <button class="btn btn-primary" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+
+            </form>
+        </div>
+        <div class="amount">
+            <a href="/board/list?amount=6">6</a>
+            <a href="/board/list?amount=18">18</a>
+            <a href="/board/list?amount=30">30</a>
+        </div>
+    </div>
+
+
+
+
     <div class="card-container">
 
         <c:forEach var="b" items="${bList}">
@@ -81,11 +111,11 @@
 <%--                맨 앞으로 가기 버튼 -> 1페이지 에서는 안보이게
                        맨뒤로 가기 버튼 마지막 페이지 에서는 안보이게 --%>
                 <c:if test="${maker.page.pageNo!=1}">
-                    <li class="page-item"><a class="page-link" href="/board/list/?pageNo=1">&lt;&lt;</a>
+                    <li class="page-item"><a class="page-link" href="/board/list/?pageNo=1&type=${s.type}&keyword=${s.keyword}">&lt;&lt;</a>
                 </c:if>
                 <c:if test="${maker.prev}">
 
-                    <li class="page-item"><a class="page-link" href="/board/list/?pageNo=${maker.begin-1}">prev</a>
+                    <li class="page-item"><a class="page-link" href="/board/list/?pageNo=${maker.begin-1}&type=${s.type}&keyword=${s.keyword}">prev</a>
                 </c:if>
 
 
@@ -94,18 +124,18 @@
 
                 <c:forEach var="i" begin="${maker.begin}" end="${maker.end}" step="1">
                     <li data-page-num="${i}" class="page-item">
-                        <a class="page-link" href="/board/list?pageNo=${i}">${i}</a>
+                        <a class="page-link" href="/board/list?pageNo=${i}&type=${s.type}&keyword=${s.keyword}">${i}</a>
                     </li>
                 </c:forEach>
 
                 <c:if test="${maker.next}">
 
-                    <li class="page-item"><a class="page-link" href="/board/list?pageNo=${maker.end+1}">next</a></li>
+                    <li class="page-item"><a class="page-link" href="/board/list?pageNo=${maker.end+1}&type=${s.type}&keyword=${s.keyword}">next</a></li>
                 </c:if>
 
 <%--    마지막에서 없애는 법...--%>
                 <c:if test="${maker.page.pageNo!=maker.finalPage}">
-                <li class="page-item"><a class="page-link" href="/board/list/?pageNo=${maker.finalPage}">&gt;&gt;</a>
+                <li class="page-item"><a class="page-link" href="/board/list/?pageNo=${maker.finalPage}&type=${s.type}&keyword=${s.keyword}">&gt;&gt;</a>
                 </li>
                 </c:if>
 
@@ -170,7 +200,7 @@
             // section태그에 붙은 글번호 읽기
             const bno = e.target.closest('section.card').dataset.bno;
             // 요청 보내기
-            window.location.href= '/board/detail?bno=' + bno;
+            window.location.href= '/board/detail?bno=' + bno+'&pageNo=${s.pageNo}&type=${s.type}&keyword=${s.keyword}';
         }
     });
 
@@ -247,7 +277,25 @@
         })
 
     }
+    //검색조건 셀렉트 박스 옵션 타입 고정
+    function  fixSearchOption(){
+        //셀렉트 박스에 옵셥 태그 전부 자겨옴
+        const $options=[...document.getElementById("search-type").children];
+        $options.forEach($opt=>{
+            if($opt.value==='${s.type}'){
+                $opt.setAttribute('selected','selected');
+            }
+            }
+        )
+    }
+
+
+
     appendPageActive();
+    fixSearchOption();
+
+    //
+
 
 
 </script>

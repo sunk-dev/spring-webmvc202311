@@ -5,6 +5,21 @@
 
     <select id="findAll" resultType="board">
         select * from tbl_board
+<!--        #{}->String 반환-->
+        <if test="type == 'title'">
+            where title like concat('%',#{keyword},'%')
+
+        </if>
+        <if test="type == 'content'">
+            where content like concat('%',#{keyword},'%')
+
+        </if>
+        <if test="type == 'tc'">
+            where title like concat('%',#{keyword},'%')
+            or content like concat('%',#{keyword},'%')
+
+        </if>
+
         order by board_no desc
         limit #{pageStart},#{amount}
     </select>
@@ -30,6 +45,19 @@
 
     <select id="count" resultType="int">
         SELECT COUNT(*) FROM tbl_board
+        <if test="type == 'title'">
+            where title like concat('%',#{keyword},'%')
+
+        </if>
+        <if test="type == 'content'">
+            where content like concat('%',#{keyword},'%')
+
+        </if>
+        <if test="type == 'tc'">
+            where title like concat('%',#{keyword},'%')
+            or content like concat('%',#{keyword},'%')
+
+        </if>
 
     </select>
 
