@@ -20,13 +20,7 @@ public class Search extends Page {
         this.keyword="";
 
     }
-    public Search(int amount) {
-        //null방지
-        this.type="";
-        this.keyword="";
-        setAmount(amount);
 
-    }
 
 
 

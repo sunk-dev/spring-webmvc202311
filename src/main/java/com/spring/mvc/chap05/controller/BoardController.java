@@ -7,6 +7,7 @@ import com.spring.mvc.chap05.dto.BoardListResponseDTO;
 import com.spring.mvc.chap05.dto.BoardWriteRequestDTO;
 import com.spring.mvc.chap05.service.BoardService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/board")
+@Slf4j
 public class BoardController {
 
     private final BoardService boardService;
@@ -26,7 +28,8 @@ public class BoardController {
         List<BoardListResponseDTO> dtoList = boardService.getList(page);
         //페이징 계산 알고리즘 적용
         PageMaker pageMaker = new PageMaker(page, boardService.getCount(page));
-        System.out.println(page);
+       log.info("/board/list GET!");
+       log.debug("pageNo{},amount{}",page.getPageNo(),page.getAmount());
         model.addAttribute("bList",dtoList);
         model.addAttribute("maker",pageMaker);
         //model.addAttribute("s",page);
