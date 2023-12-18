@@ -1,7 +1,9 @@
 package com.spring.mvc.chap05.repository;
 
+import com.spring.mvc.chap05.common.Page;
 import com.spring.mvc.chap05.entity.Reply;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -20,7 +22,7 @@ public interface ReplyMapper {
     //댓글 정체 목록조회
     //ex 3번 게시물의 모든댓글을 가져와
     //3번 게시물 번호 필요
-    List<Reply> findAll(long boardNo);
+    List<Reply> findAll(@Param("bn") long boardNo, @Param("p") Page page);
 
     //댓글총개수 조회
     int count(long boardNo);
