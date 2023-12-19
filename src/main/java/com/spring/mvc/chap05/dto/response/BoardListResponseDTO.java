@@ -1,4 +1,4 @@
-package com.spring.mvc.chap05.dto;
+package com.spring.mvc.chap05.dto.response;
 
 //데이터 베이스ㅌ에서 가져온 순수한 날것의 데이터를
 //가공 해서 ㅈ장하고 있는 갹채
