@@ -8,8 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>게시판 글쓰기</title>
 
-    <%@include file="../include/static-head.jsp" %>
 
+    <%@include file="../include/static-head.jsp" %>
 
     <style>
 
@@ -104,10 +104,28 @@
         button.list-btn:hover {
             background: #e61e8c93;
         }
+
+        /* 페이지 css */
+        /* 페이지 액티브 기능 */
+        .pagination .page-item.p-active a {
+            background: #333 !important;
+            color: #fff !important;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .pagination .page-item:hover a {
+            background: #888 !important;
+            color: #fff !important;
+        }
+
+
     </style>
 </head>
 <body>
+
 <%@include file="../include/header.jsp" %>
+
 <div id="wrap" class="form-container">
     <h1>${b.boardNo}번 게시물 내용~ </h1>
     <h2># 작성일자: ${b.date}</h2>
@@ -117,7 +135,8 @@
     <div id="content">${b.content}</div>
     <div class="buttons">
         <button class="list-btn" type="button"
-                onclick="window.location.href='/board/list?pageNo=${s.pageNo}&type=${s.type}&keyword=${s.keyword}'">목록
+                onclick="window.location.href='/board/list?pageNo=${s.pageNo}&amount=${s.amount}&type=${s.type}&keyword=${s.keyword}'">
+            목록
         </button>
     </div>
 
@@ -209,21 +228,61 @@
         </div>
     </div>
 
-    <%--    <!-- end replyModifyModal - ->--%>
+    <!-- end replyModifyModal -->
+
 
 </div>
 
 <script>
+    const URL = '/api/v1/replies';
+    const bno = '${b.boardNo}';
 
-    const URL = `/api/v1/replies`;
-    const bno = '${b.boardNo}'; //jsp에서 가져오는 건 역슬래쉬 붙이면 안됨!
-    //댓글 관련 비동기 통신 (AJAX)
-    //화면에 댓글 태그들을 랜더링하는 함수
+    // 댓글 관련 비동기통신(AJAX) 스크립트
 
-    function renderReplies({replies,count}) {
+    // 화면에 페이지들을 렌더링하는 함수
+    function renderPage({
+                            begin, end, prev, next, page, finalPage
+                        }) {
+
+        let tag = "";
+
+        //이전 버튼 만들기
+        if (prev) {
+            tag += `<li class='page-item'><a class='page-link page-active' href='\${begin - 1}'>이전</a></li>`;
+        }
+        //페이지 번호 리스트 만들기
+        for (let i = begin; i <= end; i++) {
+            let active = '';
+            if (page.pageNo === i) {
+                active = 'p-active';
+            }
+
+            tag += `<li class='page-item \${active}'><a class='page-link page-custom' href='\${i}'>\${i}</a></li>`;
+        }
+        //다음 버튼 만들기
+        if (next) {
+            tag += `<li class='page-item'><a class='page-link page-active' href='\${end + 1}'>다음</a></li>`;
+        }
+
+        // 페이지태그 렌더링
+        const $pageUl = document.querySelector('.pagination');
+        $pageUl.innerHTML = tag;
+
+        // ul에 마지막페이지 번호 저장.
+        $pageUl.dataset.fp = finalPage;
+
+    }
+
+
+    // 화면에 댓글 태그들을 렌더링하는 함수
+    function renderReplies({replies, count, pageInfo}) {
+
         let tag = '';
+
         for (let reply of replies) {
+
             const {rno, writer, text, regDate} = reply;
+
             tag += `
         <div id='replyContent' class='card-body' data-replyId='\${rno}'>
             <div class='row user-block'>
@@ -239,33 +298,135 @@
             </div>
         </div>
       `;
-            //댓글수 랜더링
-            document.getElementById('replyCnt').innerHTML=count;
-            // 댓글 랜더링
 
-            document.getElementById('replyData').innerHTML=tag;
+            // 댓글 수 렌더링
+            document.getElementById('replyCnt').innerHTML = count;
+
+            // 댓글 렌더링
+            document.getElementById('replyData').innerHTML = tag;
+
+            // 페이지 렌더링
+            renderPage(pageInfo);
+
         }
     }
 
-    // 서버에 실시간으로 비동기 통신을 해서 json을 받아오는 함수
+    // 서버에 실시간으로 비동기통신을 해서 JSON을 받아오는 함수
     function fetchGetReplies(page = 1) {
+
         fetch(`\${URL}/\${bno}/page/\${page}`)
             .then(res => res.json())
             .then(replyList => {
-                console.log(replyList)
+                console.log(replyList);
                 renderReplies(replyList);
             })
         ;
     }
 
-    //=========== 메인 실행부 ===========//
-    //즉시 실행함ㅅ수
+    // 페이지 클릭 이벤트 핸들러 등록 함수
+    function makePageButtonClickEvent() {
+
+        const $pageUl = document.querySelector('.pagination');
+
+        $pageUl.onclick = e => {
+
+            // 이벤트 타겟이 a링크가 아닌경우 href속성을 못가져올 수 있으니 타겟 제한하기
+            if (!e.target.matches('.page-item a')) return;
+
+            // console.log(e.target.getAttribute('href'));
+
+            e.preventDefault(); // href 링크이동 기능 중단 : 태그 기본 기능 동작 중단
+
+            // 페이지 번호에 맞는 새로운 댓글 목록 비동기 요청
+            fetchGetReplies(e.target.getAttribute('href'));
+        };
+
+    }
+
+    //댓글 등록 처리 핸들러
+    function makeReplyPostClickevent(){
+
+        const $addBtn= document.getElementById('replyAddBtn');
+        $addBtn.onclick=e=>{
+            const $replyText=document.getElementById('newReplyText');
+            const $replyWriter=document.getElementById('newReplyWriter');
+            console.log($replyText.value);
+            console.log($replyWriter.value);
+
+            const textVal=$replyText.value.trim();
+            const writerVal=$replyWriter.value.trim();
+
+            //사용자 입력값 검증
+            if(textVal===''||textVal===null ){
+                alert('댓글 내용은 필수 값입니다');
+                return;
+            }
+            else if(writerVal==='' || writerVal===null){
+                alert('댓글 작성자는 필수 값입니다');
+                return;
+            }else  if(writerVal.length<2||writerVal.length>8){
+                alert('댓글 작성자는 2글자에서 8글자 사이로 작성하세요!');
+                return;
+            }
+
+            const payload={
+                text:$replyText.value,
+                author:$replyWriter.value,
+                bno:bno
+            };
+
+            //서버에 POST 요청 보낵기
+            //get 방식을 제외한 요청의 정보 만들기
+            const requestInfo={
+                method:'POST',
+                headers:{
+                    'content-type':'application/json'
+                },
+                body:JSON.stringify(payload)
+            };
+
+            fetch(URL,requestInfo)
+                .then(res=>{
+                    if(res.status===200){
+                        alert('댓글이 정상등록되었습니다');
+                        return res.json();
+                    }else{
+                        alert('댓글 등록에 실패했습니다');
+                        return res.text();
+                    }
+
+                })
+                .then(responseData=>{
+                    console.log(responseData)
+                    //입력창 비우고 새로운 목록 리랜더링
+                    $replyWriter.value='';
+                    $replyText.value='';
+
+                    fetchGetReplies(responseData.pageInfo.finalPage);
+
+                });
+
+
+        };
+    }
+
+
+
+    //========== 메인 실행부 ==========//
+
+    // 즉시 실행함수
     (() => {
 
-        /// 댓글 서버에서 불러오기
+        // 댓글 서버에서 불러오기
         fetchGetReplies();
 
-    })();  //이 함수를 만들고 즉시호출
+        // 페이지 번호 클릭 이벤트 핸들러처리
+        makePageButtonClickEvent();
+
+        //댓글 등록 클릭이벤트 핸들러 처리
+        makeReplyPostClickevent();
+
+    })();
 
 
 </script>
