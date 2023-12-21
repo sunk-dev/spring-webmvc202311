@@ -24,6 +24,8 @@ import java.util.List;
  * => /replies :GET(0)
  *
  * => /replies/17 :GET - 단일 조회
+ *
+ * => /replies/3  :DELETE
  */
 @RestController
 @Slf4j
@@ -76,6 +78,31 @@ public class ReplyApiController {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
 
+    }
+
+    //댓글 삭제 요청 처리
+    @DeleteMapping("/{replyNo}")
+    public ResponseEntity<?> remove(
+            @PathVariable Long replyNo
+    ){
+        if(replyNo==null){
+            return ResponseEntity
+                    .badRequest()
+                    .body("댓글 번호를 본내주세요!");
+
+        }
+        log.info("/api/v1/replies/{} : DELETE",replyNo);
+        try {
+            ReplyListResponseDTO responseDTO = replyService.delete(replyNo);
+            return ResponseEntity
+                    .ok()
+                    .body(responseDTO);
+        }catch (Exception e){
+            return ResponseEntity
+                    .internalServerError()
+                    .body(e.getMessage());
+
+        }
     }
 
 }

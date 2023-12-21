@@ -279,11 +279,12 @@
 
         let tag = '';
 
-        for (let reply of replies) {
+        if (replies !== null && replies.length > 0) {
+            for (let reply of replies) {
 
-            const {rno, writer, text, regDate} = reply;
+                const {rno, writer, text, regDate} = reply;
 
-            tag += `
+                tag += `
         <div id='replyContent' class='card-body' data-replyId='\${rno}'>
             <div class='row user-block'>
                 <span class='col-md-3'>
@@ -292,23 +293,33 @@
                 <span class='offset-md-6 col-md-3 text-right'><b>\${regDate}</b></span>
             </div><br>
             <div class='row'>
-                <div class='col-md-6'>\${text}</div>
-                <div class='et-md-2 col-md-4 text-right'></div>
-
+                <div class='col-md-9'>\${text}</div>
+                <div class='col-md-3 text-right'>
+                    <a id='replyModBtn' class='btn btn-sm btn-outline-dark' data-bs-toggle='modal' data-bs-target='#replyModifyModal'>수정</a>&nbsp;
+                    <a id='replyDelBtn' class='btn btn-sm btn-outline-dark' href='#'>삭제</a>
+                </div>
             </div>
         </div>
       `;
 
-            // 댓글 수 렌더링
-            document.getElementById('replyCnt').innerHTML = count;
 
-            // 댓글 렌더링
-            document.getElementById('replyData').innerHTML = tag;
 
-            // 페이지 렌더링
-            renderPage(pageInfo);
 
+            } //end for
+
+        }// end if
+        else {
+            tag += "<div id='replyContent' class='card-body'>댓글이 아직 없습니다! ㅠㅠ</div>";
         }
+
+        // 댓글 수 렌더링
+        document.getElementById('replyCnt').innerHTML = count;
+
+        // 댓글 렌더링
+        document.getElementById('replyData').innerHTML = tag;
+
+        // 페이지 렌더링
+        renderPage(pageInfo);
     }
 
     // 서버에 실시간으로 비동기통신을 해서 JSON을 받아오는 함수
@@ -410,6 +421,46 @@
         };
     }
 
+    //댓글삭제 이벤트 핸들러 등록 및 처리
+    function makeReplyRemoveClickEvent(){
+        const $replyData=document.getElementById('replyData');
+        $replyData.onclick=e=>{
+            e.preventDefault(); //a 태그 링크 이동 금지
+
+            //삭제버튼에만 이벤트가 작동하도록 설정
+            if(e.target.matches('#replyDelBtn')){
+                //console.log('삭제 버튼 클릭!');
+                if(!confirm('정말로 삭제 할까요??'))return;
+                //댓글번호 찾기
+                const rno=e.target.closest('#replyContent').dataset.replyid;
+                //closest('#replyContent') -> 가장 가까운 #replyCOntent 태그를 찾아라
+                console.log(rno);
+
+                // 서버에 삭제 비동기 요청
+                const requestInfo={
+                    method: 'DELETE'
+                }
+
+               fetch(`\${URL}/\${rno}`,requestInfo)
+                   .then(res=>{
+                       if(res.status===200){
+                           alert('댓글이 삭제 되었습니다')
+                           return res.json();
+                       }else{
+                           alert('댓글 삭제에 실패했습니다')
+                           return ;
+                       }
+                   })
+                   .then(responseResult=>{
+                       renderReplies(responseResult);
+                   })
+
+            }
+        }
+    }
+
+
+
 
 
     //========== 메인 실행부 ==========//
@@ -425,6 +476,9 @@
 
         //댓글 등록 클릭이벤트 핸들러 처리
         makeReplyPostClickevent();
+
+        //댓글 삭제 클릭 이벤트 핸들어 처리
+        makeReplyRemoveClickEvent();
 
     })();
 
