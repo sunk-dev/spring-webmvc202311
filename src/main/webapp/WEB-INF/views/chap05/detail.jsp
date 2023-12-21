@@ -421,18 +421,18 @@
         };
     }
 
-    //댓글삭제 이벤트 핸들러 등록 및 처리
+    //댓글삭제 + 수정모드 진입 이벤트 핸들러 등록 및 처리
     function makeReplyRemoveClickEvent(){
         const $replyData=document.getElementById('replyData');
         $replyData.onclick=e=>{
             e.preventDefault(); //a 태그 링크 이동 금지
-
+            //댓글번호 찾기
+            const rno=e.target.closest('#replyContent').dataset.replyid;
             //삭제버튼에만 이벤트가 작동하도록 설정
             if(e.target.matches('#replyDelBtn')){
                 //console.log('삭제 버튼 클릭!');
                 if(!confirm('정말로 삭제 할까요??'))return;
-                //댓글번호 찾기
-                const rno=e.target.closest('#replyContent').dataset.replyid;
+
                 //closest('#replyContent') -> 가장 가까운 #replyCOntent 태그를 찾아라
                 console.log(rno);
 
@@ -456,8 +456,67 @@
                    })
 
             }
+
+            /// 수정부분
+             else if(e.target.matches('#replyModBtn')){
+                console.log('수정모드 진입')
+                //클릭한 수정 버튼 근처에 있는 댓글 내용 읽기
+                const replyText=e.target.parentNode.previousElementSibling.textContent;
+                ////읽은 댓글을 모달 바디에 널기
+                document.getElementById('modReplyText').value=replyText;
+
+                //
+                const $modal=document.querySelector('.modal');
+                $modal.dataset.rno=rno;
+
+
+            }
+
         }
     }
+
+
+    // 댓글 수정 클릭 이벤트 처리 함수
+    function makeReplyModifyClickEvent() {
+
+        const $modBtn = document.getElementById('replyModBtn');
+
+        $modBtn.addEventListener('click', e => {
+
+            const payload = {
+                rno: +document.querySelector('.modal').dataset.rno,
+                text: document.getElementById('modReplyText').value,
+                bno: +bno
+            };
+            console.log(payload);
+
+            const requestInfo = {
+                method: 'PUT',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            };
+
+            fetch(URL, requestInfo)
+                .then(res => {
+                    if (res.status === 200) {
+                        alert('댓글이 수정되었습니다.');
+                        // modal창 닫기
+                        document.getElementById('modal-close').click();
+                        return res.json();
+                    } else {
+                        alert('댓글이 수정에 실패했습니다.');
+                        document.getElementById('modal-close').click();
+                        return;
+                    }
+                })
+                .then(result => {
+                    renderReplies(result);
+                });
+        });
+    }
+
 
 
 
@@ -479,6 +538,10 @@
 
         //댓글 삭제 클릭 이벤트 핸들어 처리
         makeReplyRemoveClickEvent();
+
+
+        //댓글 수정 틀릭 이벤트 핸들어 처리
+        makeReplyModifyClickEvent();
 
     })();
 
