@@ -1,5 +1,6 @@
 package com.spring.mvc.chap05.repository;
 
+import com.spring.mvc.chap05.common.Page;
 import com.spring.mvc.chap05.entity.Board;
 import com.spring.mvc.chap05.entity.Reply;
 import org.apache.ibatis.annotations.Mapper;
@@ -58,7 +59,7 @@ class ReplyMapperTest {
 
         
         //when
-        List<Reply> all = replyMapper.findAll(boardNo);
+        List<Reply> all = replyMapper.findAll(boardNo,new Page());
         //then
         assertEquals(8,all.size());
         assertEquals("어린이35",all.get(0).getReplyWriter());
@@ -75,7 +76,7 @@ class ReplyMapperTest {
         Reply one = replyMapper.findOne(replyNo);
         //then
         assertNull(one);
-        assertEquals(7,replyMapper.findAll(boardNo).size());
+        assertEquals(7,replyMapper.findAll(boardNo,new Page()).size());
 
     }
 
